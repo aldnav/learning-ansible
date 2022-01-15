@@ -1,0 +1,11 @@
+[webservers]
+node-1
+
+[dbservers]
+node-2
+
+[nfsserver]
+node-1
+
+[nfsclients]
+node-2

@@ -1,0 +1,14 @@
+node-1 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+10.10.10.12 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
