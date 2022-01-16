@@ -1,0 +1,4 @@
+--- # contains all variables pertaining to static assets
+
+home: "/home/vagrant"
+pictures_folder: "/home/vagrant/pictures"

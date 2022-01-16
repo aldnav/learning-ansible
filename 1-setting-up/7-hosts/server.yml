@@ -1,0 +1,13 @@
+--- # installs nginx for static web host
+
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: "install nginx"
+      apt:
+        name: nginx
+        state: present
+    - name: "start nginx"
+      service:
+        name: nginx
+        state: started

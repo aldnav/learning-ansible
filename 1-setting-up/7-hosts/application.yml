@@ -1,0 +1,14 @@
+---
+- hosts: local
+  become: true
+  # remote_user: justin
+  # tasks:
+    # - name: "install nginx"
+
+- hosts: webservers
+  become: true
+
+
+- hosts: dbservers
+  become: true
+

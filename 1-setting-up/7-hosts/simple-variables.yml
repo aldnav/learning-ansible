@@ -1,0 +1,31 @@
+--- # explore the use of variables
+
+- hosts: webservers
+  # vars:
+  #   home: "/home/vagrant"
+  #   pictures_folder: "/home/vagrant/pictures"
+  # vars_files:
+  #   - ./statics.yml
+  # vars_prompt:
+  #   - name: "home"
+  #     prompt: "Where is the home directory?"
+  #     private: no
+  #     default: "/home/vagrant"
+  #   - name: "pictures_folder"
+  #     prompt: "Where should the pictures be stored?"
+  #     private: no
+  #     default: "/home/vagrant/pictures"
+  #   - name: "password"
+  #     prompt: "What is the password?"
+  #     private: yes
+  tasks:
+    - name: "create a file in the home directory"
+      file:
+        path: "{{ home }}/awesome.txt"
+        state: file
+    - name: "create the pictures folder"
+      file:
+        path: "{{ pictures_folder }}"
+        state: directory
+    - name: "put password in awesome.txt"
+      shell: "echo {{ password }} >> {{ home }}/awesome.txt"

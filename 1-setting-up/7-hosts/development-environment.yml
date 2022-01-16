@@ -1,0 +1,21 @@
+--- # Setup appropriate tools on the development machines
+
+- hosts: devmachines
+  become: true
+  tasks:
+    - name: "install git"
+      apt:
+        name: git
+        state: present
+    - name: "install vim"
+      apt:
+        name: vim
+        state: present
+    - name: "setup dev folder"
+      file:
+        path: /code
+        state: directory
+    - name: "add developers group"
+      group:
+        name: developers
+        state: present
