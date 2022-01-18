@@ -1,0 +1,31 @@
+--- # setup dev machines
+- hosts: devmachines
+  become: true
+  vars:
+    required_packages:
+      - git
+      - vim
+      - zsh
+      - nodejs
+  tasks:
+    - name: "install base packages"
+      apt:
+        name: "{{ item }}"
+        state: present  # what if i want --fix-missing
+      with_items: "{{ required_packages }}"
+    # - name: "install git"
+    #   apt:
+    #     name: git
+    #     state: present
+    # - name: "install vim"
+    #   apt:
+    #     name: vim
+    #     state: present
+    # - name: "install zsh"
+    #   apt:
+    #     name: zsh
+    #     state: fixed  # this one somehow resolves --fix-missing
+    # - name: "install nodejs"
+    #   apt:
+    #     name: nodejs
+    #     state: fixed
