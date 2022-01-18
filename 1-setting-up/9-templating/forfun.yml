@@ -1,0 +1,30 @@
+---  # Demo templating features
+- hosts: webservers
+  become: true
+  vars:
+    message_for_admin: "Hello admin, it is a nice day"
+    ips:
+      - "10.10.10.11"
+      - "10.10.10.12"
+    some_data: "cheese"
+    users:
+      - name: Cardo
+        username: cardodalisay
+        shell: /bin/sh
+      - name: Alyana
+        username: Alyana
+        shell: /bin/sh
+      - { name: "Ingo", username: "superingo", shell: "/bin/bash" }
+  tasks:
+    - name: "template a nice message for admins"
+      template:
+        src: ./templates/message.j2
+        dest: /tmp/message
+    - name: "setup ip configuration"
+      template:
+        src: ./templates/ip.conf.j2
+        dest: /tmp/ip.conf
+    - name: "setup user configurations"
+      template:
+        src: ./templates/users.xml.j2
+        dest: /tmp/users.xml

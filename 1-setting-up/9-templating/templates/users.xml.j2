@@ -1,0 +1,9 @@
+<Users>
+{% for user in users %}
+    <User>
+    <Name>{{ user.name}}</Name>
+    <Username>{{ user.username }}</Username>
+    <Shell>{{ user.shell }}</Shell>
+    </User>
+{% endfor %}
+</Users>
