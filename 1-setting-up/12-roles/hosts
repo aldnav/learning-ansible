@@ -1,0 +1,9 @@
+[backend-developers]
+node-1
+
+[web-developers]
+node-2
+
+[devmachines:children]
+web-developers
+backend-developers

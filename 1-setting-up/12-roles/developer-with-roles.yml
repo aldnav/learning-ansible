@@ -1,0 +1,20 @@
+---
+- hosts: devmachines
+  become: true
+  remote_user: vagrant
+  roles:
+    - "common"
+
+- hosts: web-developers
+  become: true
+  remote_user: vagrant
+  roles:
+    - "nodejs"
+    - "frontendteam"
+
+- hosts: backend-developers
+  become: true
+  remote_user: vagrant
+  roles:
+    - "flask"
+    - "backendteam"

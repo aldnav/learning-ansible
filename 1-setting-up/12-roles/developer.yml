@@ -1,0 +1,95 @@
+--- #Demo setting up different development machines
+
+- hosts: devmachines
+  become: true
+  remote_user: vagrant
+  tasks:
+    - name: "install common packages"
+      apt:
+        name: "{{ item }}"
+        state: latest
+      with_items:
+        - git
+        - zsh
+        - vim
+    - name: "add developer group"
+      group:
+        name: "developers"
+        state: present
+
+- hosts: web-developers
+  become: true
+  remote_user: vagrant
+  vars:
+    users:
+      - username: "cherokee"
+        shell: "/bin/bash"
+      - username: "aubri"
+        shell: "/bin/zsh"
+  tasks:
+    - name: "set up nodejs key"
+      apt_key:
+        url: "https://deb.nodesource.com/gpgkey/noderesource.gpg.key"
+        state: present
+    - name: "set up nodejs repository"
+      apt_repository:
+        repo: "deb https://deb.nodesource.com/node_17.x impish main"
+        state: present
+    - name: "install nodejs setup"
+      apt:
+        name: nodejs
+        state: latest
+    - name: "set up users"
+      user:
+        name: "{{ item.username }}"
+        groups:
+          - developers
+        shell: "{{ item.shell }}"
+      with_items: "{{ users }}"
+    - name: "make a code directory"
+      file:
+        path: "/home/{{ item.username }}/code"
+        state: directory
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+      with_items: "{{ users }}"
+
+- hosts: backend-developers
+  become: true
+  remote_user: vagrant
+  vars:
+    users:
+      - username: "justin"
+        shell: "/bin/zsh"
+      - username: "daniel"
+        shell: "/bin/bash"
+  tasks:
+    - name: "install the python3.9 distribution"
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - python3.9
+        - python3-pip
+    - name: "ensure pip executable is available"
+      file:
+        src: "/usr/bin/pip3"
+        dest: "/usr/bin/pip"
+        state: link
+    - name: "install Flask python framework"
+      pip:
+        name: Flask
+        state: latest
+    - name: "set up users"
+      user:
+        name: "{{ item.username }}"
+        groups:
+          - developers
+        shell: "{{ item.shell }}"
+    - name: "make a code directory"
+      file:
+        path: "/home/{{ item.username }}/code"
+        state: directory
+        owner: "{{ item.username }}"
+        group: "{{ item.username }}"
+      with_items: "{{ users }}"

@@ -1,53 +1,31 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 Vagrant.configure("2") do |config|
-    config.vm.define "controller" do |controller|
-      controller.vm.box = "rkrause/ubuntu-21.10-arm64"  # this one seems to be faster to boot
-      # controller.vm.box = "bytesguy/ubuntu-server-21.10-arm64"
-      controller.vm.box_version = "1.0.0"
-      controller.vm.hostname = "controller"
-      controller.vm.network "private_network", ip: "10.10.10.10"
-      controller.vm.provider :vmware_desktop do |vmware|
-          vmware.vmx["memsize"] = "512"
-          vmware.vmx["numvcpus"] = 1
-      end
-      controller.vm.provision :shell, path: 'ubuntu-setup.sh'
-    end
-  
-    (1..2).each do |i|
-      config.vm.define "node-#{i}" do |node|
-        node.vm.box = "rkrause/ubuntu-21.10-arm64"
-        node.vm.box_version = "1.0.0"
-        node.vm.hostname = "node-#{i}"
-        node.vm.network "private_network", ip: "10.10.10.1#{i}"
-        node.vm.provider :vmware_desktop do |vmware|
-          vmware.vmx["memsize"] = "512"
-          vmware.vmx["numvcpus"] = 1
-        end
+
+  (1..2).each do |i|
+    config.vm.define "node-#{i}" do |node|
+      node.vm.box = "rkrause/ubuntu-21.10-arm64"
+      node.vm.box_version = "1.0.0"
+      node.vm.hostname = "node-#{i}"
+      node.vm.network "private_network", ip: "10.10.10.1#{i}", netmask:"255.255.0.0"
+      node.vm.provider :vmware_desktop do |vmware|
+        vmware.vmx["memsize"] = "512"
+        vmware.vmx["numvcpus"] = 1
       end
     end
-
-    # config.vm.define "redhat-node" do |redhat|
-    #     redhat.vm.box = "kashfay110/redhat7"
-    #     redhat.vm.hostname = "redhat-node"
-    #     redhat.vm.network "private_network", ip: "10.10.10.13"
-    #     redhat.vm.provider :vmware_desktop do |vmware|
-    #         vmware.vmx["memsize"] = "512"
-    #         vmware.vmx["numvcpus"] = 1
-    #     end
-    #     redhat.ssh.insert_key = false
-    # end
-
-    config.vm.define "fedora-node" do |fedoranode|
-        fedoranode.vm.box = "scottharwell/fedora-35-aarch64"
-        fedoranode.vm.box_version = "1.0.1"
-        fedoranode.vm.hostname = "fedora-node"
-        fedoranode.vm.network "private_network", ip: "10.10.10.13"
-        fedoranode.vm.provider :parallels do |parallels|
-            parallels.memory = 512
-            parallels.cpus = 1
-        end
-        fedoranode.ssh.insert_key = false
-    end
-
   end
+
+  config.vm.define "controller" do |controller|
+    controller.vm.box = "rkrause/ubuntu-21.10-arm64"  # this one seems to be faster to boot
+    # controller.vm.box = "bytesguy/ubuntu-server-21.10-arm64"
+    controller.vm.box_version = "1.0.0"
+    controller.vm.hostname = "controller"
+    controller.vm.network "private_network", ip: "10.10.10.10", netmask:"255.255.0.0"
+    controller.vm.provider :vmware_desktop do |vmware|
+        vmware.vmx["memsize"] = "512"
+        vmware.vmx["numvcpus"] = 1
+        # vmware.gui = true
+    end
+    controller.vm.provision :shell, path: 'ubuntu-setup.sh'
+  end
+end
