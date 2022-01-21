@@ -4,11 +4,7 @@ Decision making capabilities of Ansible Playbooks
 
 Example: Playbook responds to different OSes
 
-
-
-
-
-! Cannot use Red Hat. As of writing, there is no compatible Red Hat Linux box for ARM or Apple Silicon.
+⚠️ Cannot use Red Hat. As of writing, there is no compatible Red Hat Linux box for ARM or Apple Silicon.
 
 ```
 cat /path/to/.vagrant/machines/redhat-node/vmware_desktop/040458a2-3e45-43b4-8adc-16fa6bfd6e1f/vmware.log
@@ -158,3 +154,140 @@ Stderr: Failed to start the VM: This product was activated for a limited period 
 
 Nope. Not having a Parallels run VM either. It's expensive just to test out control flow.
 
+Just taking notes for now.
+
+## 📝 Using `when`
+
+```yaml
+--- using when
+- hosts: webservers
+  become: true
+  tasks:
+    - name: "install apache2 webserver"
+      apt:
+        name: apache2
+        state: present
+      when: ansible_os_family == "Debian"
+    - name: "install httpd webserver"
+      apt:
+        name: httpd
+        state: present
+      when: ansible_os_family == "Redhat"
+```
+
+Cons:  
+
+- Hard to maintain
+
+Set of user files.
+
+Scenario: Put in user configuration when a name exists (arbitrary condition)
+
+```yaml
+--- setup user configuration using when
+- hosts: webservers
+  become: true
+  vars:
+    users:
+      - "Justin"
+      - "Aubri"
+      - "Cherokee"
+      - "Daniel"
+      - "Zach"
+  tasks:
+    - name: "install apache2 webserver"
+      apt:
+        name: apache2
+        state: present
+      when: ansible_os_family == "Debian"
+    - name: "install httpd webserver"
+      apt:
+        name: httpd
+        state: present
+      when: ansible_os_family == "Redhat"
+    - name: "remove previous user configuration"  # just for educational purposes  
+      file:
+        path: /tmp/users.xml
+        state: absent
+    - name: "setup user configuration"
+      template:
+        src: ./users.xml.j2
+        dest: /tmp/users.xml
+      when: "'Cherokee' in users"  # Condition: Is the username in the list of users?
+```
+
+Templating is a way of using Jinja2 templating engine to abstract away repetitive tasks.
+
+Template: users.xml.j2
+
+```j2
+<Users>
+  {% for user in users %}
+  <User>{{ user }}</User>
+  {% endfor %}
+</Users>
+```
+
+Pros:
+
+- Customizable
+- Specificity
+
+## 📝 Using `roles`
+
+Next lesson.
+
+## 📝 Using variable rules
+
+```yaml
+--- setup user configuration using when
+- hosts: webservers
+  become: true
+  vars:
+    users:
+      - "Justin"
+      - "Aubri"
+      - "Cherokee"
+      - "Daniel"
+      - "Zach"
+  vars_files:
+    - "./{{ ansible_os_family }}.variables.yml"
+  handlers:
+    - name: "restart the webserver"
+      service:
+        name: "{{ webserver }}"
+        state: restarted
+  tasks:
+    - name: "install apache2 webserver"
+      apt:
+        name: apache2
+        state: present
+      when: ansible_os_family == "Debian"
+    - name: "install httpd webserver"
+      apt:
+        name: httpd
+        state: present
+      when: ansible_os_family == "RedHat"
+    - name: "remove previous user configuration"  # just for educational purposes  
+      file:
+        path: /tmp/users.xml
+        state: absent
+    - name: "setup user configuration"
+      template:
+        src: ./users.xml.j2
+        dest: /tmp/users.xml
+      when: "'Cherokee' in users"  # Condition: Is the username in the list of users?
+      notify: "restart the webserver"
+```
+
+```yaml
+--- RedHat.variables.yml
+webserver: "apache2"
+```
+
+```yaml
+--- Debian.variables.yml
+webserver: "httpd"
+```
+
+Defined same variable name depending on the platform.
