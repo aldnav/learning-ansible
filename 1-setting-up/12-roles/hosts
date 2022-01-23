@@ -7,3 +7,6 @@ node-2
 [devmachines:children]
 web-developers
 backend-developers
+
+[server]
+node-3

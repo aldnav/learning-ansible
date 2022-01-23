@@ -1,4 +1,10 @@
 ---
+- hosts: server
+  become: true
+  remote_user: vagrant
+  roles:
+    - "nginx"
+
 - hosts: devmachines
   become: true
   remote_user: vagrant

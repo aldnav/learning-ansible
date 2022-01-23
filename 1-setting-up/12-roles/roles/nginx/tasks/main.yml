@@ -1,0 +1,17 @@
+--- # get nginx up and running
+
+- name: "install nginx"
+  apt:
+    name: nginx
+    state: latest
+- name: "start nginx service"
+  service:
+    name: nginx
+    state: started
+- name: "fake updating a configuration"
+  file:
+    path: "nginx.conf"
+    state: touch
+  # every time change is made notify restart nginx
+  notify:
+    - "restart nginx"

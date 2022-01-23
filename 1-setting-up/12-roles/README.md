@@ -375,3 +375,170 @@ Make handlers and how to use it in roles?
 
 Do they work the same?
 
+### Setup
+
+```console
+/roles/nginx
+├── handlers
+│   └── main.yml
+├── tasks
+│   └── main.yml
+└── variables
+    └── main.yml
+```
+
+```yml
+--- # roles/nginx/tasks/main.yml
+
+- name: "install nginx"
+  apt:
+    name: nginx
+    state: latest
+- name: "start nginx service"
+  service:
+    name: nginx
+    state: started--- # get nginx up and running
+
+- name: "install nginx"
+  apt:
+    name: nginx
+    state: latest
+- name: "start nginx service"
+  service:
+    name: nginx
+    state: started
+```
+
+```console
+vagrant@controller:/vagrant/12-roles$ ansible-playbook developer-with-roles.yml
+vagrant@controller:/vagrant/12-roles$ ansible-playbook -l server developer-with-roles.yml
+[WARNING]: Invalid characters were found in group names but not replaced, use -vvvv to see details
+
+PLAY [server] *****************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ********************************************************************************************************************************************************************************************
+ok: [node-3]
+
+TASK [nginx : install nginx] **************************************************************************************************************************************************************************************
+changed: [node-3]
+
+TASK [nginx : start nginx service] ********************************************************************************************************************************************************************************
+ok: [node-3]
+
+PLAY [devmachines] ************************************************************************************************************************************************************************************************
+skipping: no hosts matched
+
+PLAY [web-developers] *********************************************************************************************************************************************************************************************
+skipping: no hosts matched
+
+PLAY [backend-developers] *****************************************************************************************************************************************************************************************
+skipping: no hosts matched
+
+PLAY RECAP ********************************************************************************************************************************************************************************************************
+node-3                     : ok=3    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+Test
+
+```
+vagrant@controller:/vagrant/12-roles$ curl http://node-3/
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to nginx!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.</p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Thank you for using nginx.</em></p>
+</body>
+</html>
+```
+
+### Adding a handler
+
+Adding a handler on NGINX to be notified on a supposed change
+
+```yaml
+--- #roles/nginx/tasks/main.yml
+
+- name: "install nginx"
+  apt:
+    name: nginx
+    state: latest
+- name: "start nginx service"
+  service:
+    name: nginx
+    state: started
+- name: "fake updating a configuration"
+  file:
+    path: "nginx.conf"
+    state: touch
+  # every time change is made notify restart nginx
+  notify:
+    - "restart nginx"
+```
+
+```yaml
+--- # roles/nginx/handlers/main.yml # handlers for nginx
+- name: "restart nginx"
+  service:
+    name: nginx
+    state: restarted--- # handlers for nginx
+- name: "restart nginx"
+  service:
+    name: nginx
+    state: restarted
+```
+
+```console
+vagrant@controller:/vagrant/12-roles$ ansible-playbook -l server developer-with-roles.yml
+[WARNING]: Invalid characters were found in group names but not replaced, use -vvvv to see details
+
+PLAY [server] *****************************************************************************************************************************************************************************************************
+
+TASK [Gathering Facts] ********************************************************************************************************************************************************************************************
+ok: [node-3]
+
+TASK [nginx : install nginx] **************************************************************************************************************************************************************************************
+ok: [node-3]
+
+TASK [nginx : start nginx service] ********************************************************************************************************************************************************************************
+ok: [node-3]
+
+TASK [nginx : fake updating a configuration] **********************************************************************************************************************************************************************
+changed: [node-3]
+
+RUNNING HANDLER [nginx : restart nginx] ***************************************************************************************************************************************************************************
+changed: [node-3]
+
+PLAY [devmachines] ************************************************************************************************************************************************************************************************
+skipping: no hosts matched
+
+PLAY [web-developers] *********************************************************************************************************************************************************************************************
+skipping: no hosts matched
+
+PLAY [backend-developers] *****************************************************************************************************************************************************************************************
+skipping: no hosts matched
+
+PLAY RECAP ********************************************************************************************************************************************************************************************************
+node-3                     : ok=5    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+### Referencing handlers
+
+If it role based, not easily going to be called. E.g. using handlers from other roles.

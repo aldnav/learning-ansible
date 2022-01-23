@@ -1,0 +1,4 @@
+---
+
+nginx_http_port: 4000
+nginx_server_name: 'devpro'
