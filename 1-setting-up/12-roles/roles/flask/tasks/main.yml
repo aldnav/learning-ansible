@@ -1,0 +1,6 @@
+--- # flask group specific tasks
+
+- name: "install Flask python framework"
+  pip:
+    name: Flask
+    state: latest

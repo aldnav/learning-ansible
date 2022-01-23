@@ -8,13 +8,25 @@
 - hosts: web-developers
   become: true
   remote_user: vagrant
+  vars:
+    users:
+      - username: "cherokee"
+        shell: "/bin/bash"
+      - username: "aubri"
+        shell: "/bin/zsh"
   roles:
-    - "nodejs"
     - "frontendteam"
+    - "nodejs"
 
 - hosts: backend-developers
   become: true
   remote_user: vagrant
+  vars:
+    users:
+      - username: "justin"
+        shell: "/bin/zsh"
+      - username: "daniel"
+        shell: "/bin/bash"
   roles:
-    - "flask"
     - "backendteam"
+    - "flask"

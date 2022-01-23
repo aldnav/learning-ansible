@@ -1,0 +1,29 @@
+--- # backend team tasks
+
+- name: "install the python3.9 distribution"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python3.9
+    - python3-pip
+# - name: "ensure pip executable is available"
+#   file:
+#     src: "/usr/bin/pip3"
+#     dest: "/usr/bin/pip"
+#     state: link
+# Skipped. See readme why
+- name: "set up users"
+  user:
+    name: "{{ item.username }}"
+    groups:
+      - developers
+    shell: "{{ item.shell }}"
+  with_items: "{{ users }}"
+- name: "make a code directory"
+  file:
+    path: "/home/{{ item.username }}/code"
+    state: directory
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+  with_items: "{{ users }}"

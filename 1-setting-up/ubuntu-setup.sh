@@ -16,4 +16,4 @@ echo "
 
 ssh-keyscan node-1 node-2 >> /home/vagrant/.ssh/known_hosts
 
-chown -R vagrant:vagrant /home/vagrant/.ssh
+chown -R vagrant:vagrant /home/vagrant/.ssh 

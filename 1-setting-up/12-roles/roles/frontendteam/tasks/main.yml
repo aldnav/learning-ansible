@@ -1,0 +1,16 @@
+--- # frontendteam tasks
+
+- name: "set up users"
+  user:
+    name: "{{ item.username }}"
+    groups:
+      - developers
+    shell: "{{ item.shell }}"
+  with_items: "{{ users }}"
+- name: "make a code directory"
+  file:
+    path: "/home/{{ item.username }}/code"
+    state: directory
+    owner: "{{ item.username }}"
+    group: "{{ item.username }}"
+  with_items: "{{ users }}"

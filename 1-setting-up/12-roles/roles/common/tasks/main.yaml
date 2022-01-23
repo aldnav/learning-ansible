@@ -1,0 +1,14 @@
+--- # common tasks
+
+- name: "install common packages"
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - git
+    - zsh
+    - vim
+- name: "add developer group"
+  group:
+    name: "developers"
+    state: present
