@@ -8,9 +8,11 @@ Vagrant.configure("2") do |config|
       node.vm.box_version = "1.0.0"
       node.vm.hostname = "node-#{i}"
       node.vm.network "private_network", ip: "10.10.10.1#{i}", netmask:"255.255.0.0"
-      node.vm.provider :vmware_desktop do |vmware|
+      node.vm.provider :vmware_fusion do |vmware|
         vmware.vmx["memsize"] = "512"
         vmware.vmx["numvcpus"] = 1
+        vmware.vmx["ethernet0.pcislotnumber"] = "160"
+        # vmware.gui = true
       end
     end
   end
@@ -21,9 +23,10 @@ Vagrant.configure("2") do |config|
     controller.vm.box_version = "1.0.0"
     controller.vm.hostname = "controller"
     controller.vm.network "private_network", ip: "10.10.10.10", netmask:"255.255.0.0"
-    controller.vm.provider :vmware_desktop do |vmware|
+    controller.vm.provider :vmware_fusion do |vmware|
         vmware.vmx["memsize"] = "512"
         vmware.vmx["numvcpus"] = 1
+        vmware.vmx["ethernet0.pcislotnumber"] = "160"
         # vmware.gui = true
     end
     controller.vm.provision :shell, path: 'ubuntu-setup.sh'
